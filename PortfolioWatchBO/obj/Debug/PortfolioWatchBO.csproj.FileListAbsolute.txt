@@ -1,0 +1,4 @@
+c:\users\andy\documents\visual studio 2015\Projects\PortfolioWatch\PortfolioWatchBO\bin\Debug\PortfolioWatchBO.dll
+c:\users\andy\documents\visual studio 2015\Projects\PortfolioWatch\PortfolioWatchBO\bin\Debug\PortfolioWatchBO.pdb
+c:\users\andy\documents\visual studio 2015\Projects\PortfolioWatch\PortfolioWatchBO\obj\Debug\PortfolioWatchBO.dll
+c:\users\andy\documents\visual studio 2015\Projects\PortfolioWatch\PortfolioWatchBO\obj\Debug\PortfolioWatchBO.pdb

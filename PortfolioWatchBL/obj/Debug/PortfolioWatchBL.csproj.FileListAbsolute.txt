@@ -1,0 +1,7 @@
+c:\users\andy\documents\visual studio 2015\Projects\PortfolioWatch\PortfolioWatchBL\bin\Debug\PortfolioWatchBL.dll
+c:\users\andy\documents\visual studio 2015\Projects\PortfolioWatch\PortfolioWatchBL\bin\Debug\PortfolioWatchBL.pdb
+c:\users\andy\documents\visual studio 2015\Projects\PortfolioWatch\PortfolioWatchBL\obj\Debug\PortfolioWatchBL.dll
+c:\users\andy\documents\visual studio 2015\Projects\PortfolioWatch\PortfolioWatchBL\obj\Debug\PortfolioWatchBL.pdb
+c:\users\andy\documents\visual studio 2015\Projects\PortfolioWatch\PortfolioWatchBL\obj\Debug\PortfolioWatchBL.csprojResolveAssemblyReference.cache
+c:\users\andy\documents\visual studio 2015\Projects\PortfolioWatch\PortfolioWatchBL\bin\Debug\PortfolioWatchBO.dll
+c:\users\andy\documents\visual studio 2015\Projects\PortfolioWatch\PortfolioWatchBL\bin\Debug\PortfolioWatchBO.pdb
