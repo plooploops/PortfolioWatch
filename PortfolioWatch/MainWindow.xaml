@@ -73,6 +73,8 @@
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Ticker" 
                                Binding="{Binding Ticker}" />
+                    <DataGridTextColumn Header="Date" 
+                               Binding="{Binding Date, StringFormat=d}"/>
                     <DataGridTextColumn Header="Market Price" 
                                Binding="{Binding MarketPrice, StringFormat=\{0:C\}}" />
                     <DataGridTextColumn Header="Open" 
@@ -85,8 +87,6 @@
                                Binding="{Binding Close, StringFormat=\{0:C\}}" />
                     <DataGridTextColumn Header="Adjusted Close" 
                                Binding="{Binding AdjClose, StringFormat=\{0:C\}}" />
-                    <DataGridTextColumn Header="Date" 
-                               Binding="{Binding Date, StringFormat=d}"/>
                     <DataGridTextColumn Header="Volume" 
                                Binding="{Binding Volume}"/>
                 </DataGrid.Columns>
