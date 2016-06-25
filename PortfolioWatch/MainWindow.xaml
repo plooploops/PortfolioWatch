@@ -33,8 +33,11 @@
                                Binding="{Binding DailyDifference, StringFormat=\{0:C\}}"/>
                     <DataGridTextColumn Header="Inception To Date Difference" 
                                Binding="{Binding InceptionToDateDifference, StringFormat=\{0:C\}}"/>
-                    <DataGridTextColumn Header="Holding" 
-                               Binding="{Binding CurrentHolding, StringFormat=\{0:C\}}"/>
+                    <DataGridTextColumn Header="Holding Cost" 
+                               Binding="{Binding CurrentHoldingCost, StringFormat=\{0:C\}}"/>
+                    <DataGridTextColumn Header="Current Value" 
+                               Binding="{Binding CurrentHoldingValue, StringFormat=\{0:C\}}"/>
+
                 </DataGrid.Columns>
             </DataGrid>
 

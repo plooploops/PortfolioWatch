@@ -164,25 +164,26 @@ namespace PortfolioWatch.ViewModels
 
         private void UpdatePortfolioCalculations()
         {
-            //update the positions based on market.
-            for (int i = 0; i < 2; i++)
+            //update twice to account for newly added ones.
+            foreach (var pos in PortfolioViewModel.Positions)
             {
-                //update twice to account for newly added ones.
-                foreach (var pos in PortfolioViewModel.Positions)
-                {
-                    var relevantHistory = MarketHistoryViewModel.History.Where(_ => _.Ticker == pos.Ticker && _.Date < pos.OpeningDate).OrderByDescending(_ => _.Date).ToList();
-                    var yesterdayHistory = relevantHistory.First();
-                    var inceptionHistory = relevantHistory.Last();
+                var relevantHistory = MarketHistoryViewModel.History.Where(_ => _.Ticker == pos.Ticker && _.Date < pos.OpeningDate).OrderByDescending(_ => _.Date).ToList();
+                if (relevantHistory.Count == 0)
+                    continue;
+                var yesterdayHistory = relevantHistory.First();
 
-                    var yesterdayPosition = new Position() { OpeningDate = yesterdayHistory.Date, Price = yesterdayHistory.MarketPrice, Ticker = pos.Ticker };
-                    var inceptionPosition = new Position() { OpeningDate = inceptionHistory.Date, Price = inceptionHistory.MarketPrice, Ticker = pos.Ticker };
+                var yesterdayPosition = new Position() { OpeningDate = yesterdayHistory.Date, Price = yesterdayHistory.MarketPrice, Ticker = pos.Ticker };
+        
+                pos.YesterdayModel = yesterdayPosition;
 
-                    pos.YesterdayModel = yesterdayPosition;
-                    pos.InceptionModel = inceptionPosition;
+                var currentHistory = MarketHistoryViewModel.History.Where(_ => _.Ticker == pos.Ticker && _.Date >= pos.OpeningDate).OrderBy(_ => _.Date).ToList();
+                pos.Price = currentHistory.First().AdjClose;
+                var today = MarketHistoryViewModel.History.Where(_ => _.Ticker == pos.Ticker).OrderByDescending(_ => _.Date).ToList();
+                pos.TodayModel = new Position() { OpeningDate = today.First().Date, Price = today.First().MarketPrice, Ticker = pos.Ticker };
 
-                    var currentHistory = MarketHistoryViewModel.History.Where(_ => _.Ticker == pos.Ticker && _.Date >= pos.OpeningDate).OrderBy(_ => _.Date).ToList();
-                    pos.Price = currentHistory.First().AdjClose;
-                }
+                var inceptionHistory = today.Last();
+                var inceptionPosition = new Position() { OpeningDate = inceptionHistory.Date, Price = inceptionHistory.MarketPrice, Ticker = pos.Ticker };
+                pos.InceptionModel = inceptionPosition;
             }
         }
 

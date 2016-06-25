@@ -62,6 +62,10 @@ namespace PortfolioWatch.ViewModels
                 Model.Price = value;
                 NotifyPropertyChanged("Price");
                 NotifyPropertyChanged("CurrentHolding");
+                NotifyPropertyChanged("DailyDifference");
+                NotifyPropertyChanged("InceptionToDateDifference");
+                NotifyPropertyChanged("CurrentHoldingCost");
+                NotifyPropertyChanged("CurrentHoldingValue");
             }
         }
 
@@ -80,14 +84,14 @@ namespace PortfolioWatch.ViewModels
         {
             get
             {
-                if (InceptionModel != null)
-                    return Model.Price - InceptionModel.Price;
+                if (InceptionModel != null && TodayModel != null)
+                    return TodayModel.Price - InceptionModel.Price;
                 else
                     return 0;
             }
         }
 
-        public decimal CurrentHolding
+        public decimal CurrentHoldingCost
         {
             get
             {
@@ -95,7 +99,33 @@ namespace PortfolioWatch.ViewModels
             }
         }
 
+        public decimal CurrentHoldingValue
+        {
+            get
+            {
+                if (TodayModel != null)
+                    return TodayModel.Price * Model.Size;
+                else
+                    return 0;
+            }
+        }
+
         Position Model { get; set; }
+
+        private Position _todayModel;
+        public Position TodayModel
+        {
+            get
+            {
+                return _todayModel;
+            }
+            set
+            {
+                _todayModel = value;
+                NotifyPropertyChanged("CurrentHoldingValue");
+            }
+        }
+
 
         private Position _yesterdayModel;
         public Position YesterdayModel
