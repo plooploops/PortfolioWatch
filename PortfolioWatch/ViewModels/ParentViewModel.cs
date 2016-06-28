@@ -91,50 +91,92 @@ namespace PortfolioWatch.ViewModels
 
         #region Methods
 
+        public void TryShowPopup(string message)
+        {
+            if (popup != null && !string.IsNullOrEmpty(message))
+                popup.Invoke(message);
+        }
+
         public void InitializeViewModels()
         {
-            MarketHistoryViewModel = new MarketHistoryViewModel(new List<string>()
+            try
             {
-                "MSFT", "AAPL", "GOOG", "CVX"
-            }, DateTime.Now.AddDays(-20));
-            MarketHistoryViewModel.RefreshMarketHistory();
-            PortfolioViewModel = new PortfolioViewModel(new Portfolio()
-            {
-                Name = "Test Portfolio",
-                Positions = new List<Position>() {
-                    new Position(){
-                       OpeningDate = DateTime.Today.AddDays(-2),
-                       Price = MarketHistoryViewModel.History.Where(_=> _.Date == DateTime.Today.AddDays(-2) && _.Ticker == "MSFT").First().AdjClose,
-                       Size = 123,
-                       Ticker = "MSFT"
-                    },
-                    new Position(){
-                       OpeningDate = DateTime.Today.AddDays(-2),
-                       Price = MarketHistoryViewModel.History.Where(_=> _.Date == DateTime.Today.AddDays(-2) && _.Ticker == "AAPL").First().AdjClose,
-                       Size = 321,
-                       Ticker = "AAPL"
-                    },
-                    new Position(){
-                       OpeningDate = DateTime.Today.AddDays(-2),
-                       Price = MarketHistoryViewModel.History.Where(_=> _.Date == DateTime.Today.AddDays(-2) && _.Ticker == "CVX").First().AdjClose,
-                       Size = 1232,
-                       Ticker = "CVX"
-                    },
-                    new Position(){
-                       OpeningDate = DateTime.Today.AddDays(-2),
-                       Price = MarketHistoryViewModel.History.Where(_=> _.Date == DateTime.Today.AddDays(-2) && _.Ticker == "GOOG").First().AdjClose,
-                       Size = 1242,
-                       Ticker = "GOOG"
+                string errMsg = string.Empty;
+                Task parentTask = Task.Run(() =>
+                {
+                    try
+                    {
+
+                        MarketHistoryViewModel = new MarketHistoryViewModel(new List<string>()
+                        {
+                            "MSFT", "AAPL", "GOOG", "CVX"
+                        }, DateTime.Now.AddDays(-20));
+                        MarketHistoryViewModel.RefreshMarketHistory();
+                        if (MarketHistoryViewModel.History == null || MarketHistoryViewModel.History.Count == 0)
+                        {
+                            TryShowPopup("Couldn't load history.");
+                            return;
+                        }
+                        PortfolioViewModel = new PortfolioViewModel(new Portfolio()
+                        {
+                            Name = "Test Portfolio",
+                            Positions = new List<Position>() {
+                                new Position(){
+                                   OpeningDate = DateTime.Today,
+                                   Price = MarketHistoryViewModel.History.Where(_ => _.Ticker == "MSFT").OrderByDescending(h => h.Date).First().AdjClose,
+                                   Size = 123,
+                                   Ticker = "MSFT"
+                                },
+                                new Position(){
+                                   OpeningDate = DateTime.Today,
+                                   Price = MarketHistoryViewModel.History.Where(_ => _.Ticker == "AAPL").OrderByDescending(h => h.Date).First().AdjClose,
+                                   Size = 321,
+                                   Ticker = "AAPL"
+                                },
+                                new Position(){
+                                   OpeningDate = DateTime.Today,
+                                   Price = MarketHistoryViewModel.History.Where(_ => _.Ticker == "CVX").OrderByDescending(h => h.Date).First().AdjClose,
+                                   Size = 1232,
+                                   Ticker = "CVX"
+                                },
+                                new Position(){
+                                   OpeningDate = DateTime.Today,
+                                   Price = MarketHistoryViewModel.History.Where(_ => _.Ticker == "GOOG").OrderByDescending(h => h.Date).First().AdjClose,
+                                   Size = 1242,
+                                   Ticker = "GOOG"
+                                }
+                            }
+                        });
                     }
-                }
-            });
-            UpdatePortfolioCalculations();
+                    catch (Exception ex)
+                    {
+                        errMsg = "Issue with initializing portfolio!";
+                        Console.WriteLine(ex.ToString());
+                    }
+                });
+
+                parentTask.Wait();
+                UpdatePortfolioCalculations();
+            }
+            catch (Exception ex)
+            {
+                TryShowPopup("Couldn't load initial portfolio!");
+                Console.WriteLine(ex.ToString());
+            }
         }
 
         public void RefreshViewModels()
         {
-            MarketHistoryViewModel.RefreshMarketHistory();
-            PortfolioViewModel = new PortfolioViewModel();
+            try
+            {
+                MarketHistoryViewModel.RefreshMarketHistory();
+                PortfolioViewModel = new PortfolioViewModel();
+            }
+            catch (Exception ex)
+            {
+                TryShowPopup("Couldn't refresh market data!");
+                Console.WriteLine(ex.ToString());
+            }
         }
 
         #endregion
@@ -164,34 +206,77 @@ namespace PortfolioWatch.ViewModels
 
         private void UpdatePortfolioCalculations()
         {
-            //update twice to account for newly added ones.
-            foreach (var pos in PortfolioViewModel.Positions)
+            try
             {
-                var relevantHistory = MarketHistoryViewModel.History.Where(_ => _.Ticker == pos.Ticker && _.Date < pos.OpeningDate).OrderByDescending(_ => _.Date).ToList();
-                if (relevantHistory.Count == 0)
-                    continue;
-                var yesterdayHistory = relevantHistory.First();
+                string errMsg = String.Empty;
+                Task parentTask = Task.Run(() =>
+                {
+                    try
+                    {
+                        foreach (var pos in PortfolioViewModel.Positions)
+                        {
+                            var relevantHistory = MarketHistoryViewModel.History.Where(_ => _.Ticker == pos.Ticker && _.Date < pos.OpeningDate).OrderByDescending(_ => _.Date).ToList();
+                            if (relevantHistory.Count == 0)
+                                continue;
+                            var yesterdayHistory = relevantHistory.First();
 
-                var yesterdayPosition = new Position() { OpeningDate = yesterdayHistory.Date, Price = yesterdayHistory.MarketPrice, Ticker = pos.Ticker };
-        
-                pos.YesterdayModel = yesterdayPosition;
+                            var yesterdayPosition = new Position() { OpeningDate = yesterdayHistory.Date, Price = yesterdayHistory.MarketPrice, Ticker = pos.Ticker };
 
-                var currentHistory = MarketHistoryViewModel.History.Where(_ => _.Ticker == pos.Ticker && _.Date >= pos.OpeningDate).OrderBy(_ => _.Date).ToList();
-                pos.Price = currentHistory.First().AdjClose;
-                var today = MarketHistoryViewModel.History.Where(_ => _.Ticker == pos.Ticker).OrderByDescending(_ => _.Date).ToList();
-                pos.TodayModel = new Position() { OpeningDate = today.First().Date, Price = today.First().MarketPrice, Ticker = pos.Ticker };
+                            pos.YesterdayModel = yesterdayPosition;
 
-                var inceptionHistory = today.Last();
-                var inceptionPosition = new Position() { OpeningDate = inceptionHistory.Date, Price = inceptionHistory.MarketPrice, Ticker = pos.Ticker };
-                pos.InceptionModel = inceptionPosition;
+                            var currentHistory = MarketHistoryViewModel.History.Where(_ => _.Ticker == pos.Ticker && _.Date >= pos.OpeningDate).OrderBy(_ => _.Date).ToList();
+                            pos.Price = currentHistory.First().AdjClose;
+                            var today = MarketHistoryViewModel.History.Where(_ => _.Ticker == pos.Ticker).OrderByDescending(_ => _.Date).ToList();
+                            pos.TodayModel = new Position() { OpeningDate = today.First().Date, Price = today.First().MarketPrice, Ticker = pos.Ticker };
+
+                            var inceptionHistory = today.Last();
+                            var inceptionPosition = new Position() { OpeningDate = inceptionHistory.Date, Price = inceptionHistory.MarketPrice, Ticker = pos.Ticker };
+                            pos.InceptionModel = inceptionPosition;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        errMsg = "Could not calculate portfolio!";
+                        Console.WriteLine(ex.ToString());
+                    }
+                });
+                parentTask.Wait();
+                TryShowPopup(errMsg);
+            }
+            catch (Exception ex)
+            {
+                TryShowPopup("Couldn't calculate portfolio tickers!");
+                Console.WriteLine(ex.ToString());
             }
         }
 
         private void RefreshMarketHistory()
         {
-            MarketHistoryViewModel.RefreshMarketHistory(PortfolioViewModel.Positions.Select(_ => _.Ticker).Distinct().ToList());
+            try
+            {
+                string errMsg = String.Empty;
+                Task parentTask = Task.Run(() =>
+                {
+                    try
+                    {
+                        MarketHistoryViewModel.RefreshMarketHistory(PortfolioViewModel.Positions.Select(_ => _.Ticker).Distinct().ToList());
 
-            UpdatePortfolioCalculations();
+                        UpdatePortfolioCalculations();
+                    }
+                    catch (Exception ex)
+                    {
+                        errMsg = "Could not load the market data.  Please ensure connectivity (and that yahoo finance is available!)";
+                        Console.WriteLine(ex.ToString());
+                    }
+                });
+
+                parentTask.Wait();
+                TryShowPopup(errMsg);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
         }
 
         public ICommand AddPositionNewRowClickCommand
@@ -201,30 +286,39 @@ namespace PortfolioWatch.ViewModels
 
         private void AddPosition()
         {
-            PortfolioViewModel.Positions.Add(new PositionViewModel());
+            if (PortfolioViewModel != null && PortfolioViewModel.Positions != null)
+                PortfolioViewModel.Positions.Add(new PositionViewModel());
             //this is called when the button is clicked
         }
 
         private void LoadFromFile()
         {
             //load data from .xml file
-            XmlSerializer x = new XmlSerializer(typeof(Portfolio));
-            if (!File.Exists(FilePath) && Path.GetExtension(FilePath.Trim().ToLower()) == ".xml")
+            try
             {
-                popup.Invoke("Please ensure that the file exists and that the file ends with .xml");
-                //need to pick a different file.
-                return;
+                XmlSerializer x = new XmlSerializer(typeof(Portfolio));
+                if (!File.Exists(FilePath) && Path.GetExtension(FilePath.Trim().ToLower()) == ".xml")
+                {
+                    TryShowPopup("Please ensure that the file exists and that the file ends with .xml");
+                    //need to pick a different file.
+                    return;
+                }
+                using (FileStream myFileStream = new FileStream(FilePath, FileMode.Open))
+                {
+                    // Call the Deserialize method and cast to the object type.
+                    var portfolio = (Portfolio)x.Deserialize(myFileStream);
+                    PortfolioViewModel = new PortfolioViewModel(portfolio);
+                }
+
+                UpdatePortfolioCalculations();
+
+                TryShowPopup("Loaded portfolio!");
             }
-            using (FileStream myFileStream = new FileStream(FilePath, FileMode.Open))
+            catch (Exception ex)
             {
-                // Call the Deserialize method and cast to the object type.
-                var portfolio = (Portfolio)x.Deserialize(myFileStream);
-                PortfolioViewModel = new PortfolioViewModel(portfolio);
+                TryShowPopup("Issue with loading portfolio from file.  Please be sure to select the .xml file and make sure it's not open!");
+                Console.WriteLine(ex.ToString());
             }
-
-            UpdatePortfolioCalculations();
-
-            popup.Invoke("Loaded portfolio!");
         }
 
         public ICommand LoadPortfolioClickCommand
@@ -243,7 +337,7 @@ namespace PortfolioWatch.ViewModels
             XmlSerializer x = new XmlSerializer(model.GetType());
             if (Path.GetExtension(FilePath.Trim().ToLower()) != ".xml")
             {
-                popup.Invoke("Please ensure the file ends with .xml");
+                TryShowPopup("Please ensure the file ends with .xml");
                 //need to pick a different file.
                 return;
             }
@@ -256,11 +350,11 @@ namespace PortfolioWatch.ViewModels
             }
             catch (Exception ex)
             {
-                popup.Invoke("Please ensure that the file does not exist and that the file ends with .xml.\r\nPlease ensure file access.");
+                TryShowPopup("Please ensure that the file does not exist and that the file ends with .xml.\r\nPlease ensure file access.");
                 return;
             }
 
-            popup.Invoke("Saved");
+            TryShowPopup("Saved portfolio");
         }
 
         #endregion

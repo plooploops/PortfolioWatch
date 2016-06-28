@@ -32,8 +32,21 @@ namespace PortfolioWatch.ViewModels
 
         public PortfolioViewModel(Portfolio portfolio)
         {
-            Name = portfolio.Name;
-            Positions = new ObservableCollection<PositionViewModel>( portfolio.Positions.Select(_ => new PositionViewModel(_)).ToList());
+            try
+            {
+                if (portfolio != null)
+                {
+                    Name = portfolio.Name;
+                    if (portfolio.Positions != null)
+                    {
+                        Positions = new ObservableCollection<PositionViewModel>(portfolio.Positions.Select(_ => new PositionViewModel(_)).ToList());
+                    }
+                }
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
         }
 
         #endregion
@@ -42,11 +55,19 @@ namespace PortfolioWatch.ViewModels
 
         public Portfolio GetModel()
         {
-            Portfolio p = new Portfolio();
-            p.Name = Name;
-            p.Positions = this.Positions.Select(_ => _.GetModel()).ToList();
+            try
+            {
+                Portfolio p = new Portfolio();
+                p.Name = Name;
+                p.Positions = this.Positions.Select(_ => _.GetModel()).ToList();
 
-            return p;
+                return p;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                return new Portfolio() { Name = Name, Positions = new List<Position>() };
+            }
         }
 
         #endregion

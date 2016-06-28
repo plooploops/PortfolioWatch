@@ -46,8 +46,15 @@ namespace PortfolioWatch.ViewModels
 
         public MarketHistoryViewModel(List<string> tickerList, DateTime dateTime)
         {
-            TickerList = new ObservableCollection<string>(tickerList);
-            FromDate = dateTime;
+            try
+            {
+                TickerList = new ObservableCollection<string>(tickerList);
+                FromDate = dateTime;
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
         }
 
         #endregion
@@ -56,46 +63,69 @@ namespace PortfolioWatch.ViewModels
 
         public void RefreshMarketHistory(List<string> tickerList)
         {
-            History = new ObservableCollection<DailyTickerViewModel>();
-            TickerHelper th = new TickerHelper();
-
-            foreach (var ticker in tickerList)
+            try
             {
-                var results = th.ReadTickerData(ticker);
-                foreach (var res in (results.Select(_ => new DailyTickerViewModel(_)).ToList()))
+                History = new ObservableCollection<DailyTickerViewModel>();
+                TickerHelper th = new TickerHelper();
+
+                foreach (var ticker in tickerList)
                 {
-                    History.Add(res);
+                    var results = th.ReadTickerData(ticker);
+                    foreach (var res in (results.Select(_ => new DailyTickerViewModel(_)).ToList()))
+                    {
+                        History.Add(res);
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
             }
         }
 
         public void RefreshMarketHistory()
         {
-            History = new ObservableCollection<DailyTickerViewModel>();
-            TickerHelper th = new TickerHelper();
-
-            foreach (var ticker in TickerList)
+            try
             {
-                var results = th.ReadTickerData(ticker);
-                foreach(var res in (results.Select(_ => new DailyTickerViewModel(_)).ToList()))
+                History = new ObservableCollection<DailyTickerViewModel>();
+                TickerHelper th = new TickerHelper();
+
+                foreach (var ticker in TickerList)
                 {
-                    History.Add(res);
+                    var results = th.ReadTickerData(ticker);
+                    if (results == null)
+                        continue;
+                    foreach (var res in (results.Select(_ => new DailyTickerViewModel(_)).ToList()))
+                    {
+                        History.Add(res);
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
             }
         }
 
         public void RefreshMarketHistoryFromDate(DateTime fromDate)
         {
-            History = new ObservableCollection<DailyTickerViewModel>();
-            TickerHelper th = new TickerHelper();
-
-            foreach(var ticker in TickerList)
+            try
             {
-                var results = th.ReadTickerData(ticker, fromDate);
-                foreach(var res in (results.Select(_ => new DailyTickerViewModel(_)).ToList()))
+                History = new ObservableCollection<DailyTickerViewModel>();
+                TickerHelper th = new TickerHelper();
+
+                foreach (var ticker in TickerList)
                 {
-                    History.Add(res);
+                    var results = th.ReadTickerData(ticker, fromDate);
+                    foreach (var res in (results.Select(_ => new DailyTickerViewModel(_)).ToList()))
+                    {
+                        History.Add(res);
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
             }
         }
 
