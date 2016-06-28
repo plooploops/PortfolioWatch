@@ -27,15 +27,15 @@
                                Binding="{Binding OpeningDate, StringFormat=d}"/>
                     <DataGridTextColumn Header="Size" 
                                Binding="{Binding Size}"/>
-                    <DataGridTextColumn Header="Price" 
+                    <DataGridTextColumn Header="Price" IsReadOnly="True"
                                Binding="{Binding Price, StringFormat=\{0:C\}}"/>
-                    <DataGridTextColumn Header="Daily Difference" 
+                    <DataGridTextColumn Header="Daily Difference" IsReadOnly="True"
                                Binding="{Binding DailyDifference, StringFormat=\{0:C\}}"/>
-                    <DataGridTextColumn Header="Inception To Date Difference" 
+                    <DataGridTextColumn Header="Inception To Date Difference" IsReadOnly="True"
                                Binding="{Binding InceptionToDateDifference, StringFormat=\{0:C\}}"/>
-                    <DataGridTextColumn Header="Holding Cost" 
+                    <DataGridTextColumn Header="Holding Cost" IsReadOnly="True"
                                Binding="{Binding CurrentHoldingCost, StringFormat=\{0:C\}}"/>
-                    <DataGridTextColumn Header="Current Value" 
+                    <DataGridTextColumn Header="Current Value" IsReadOnly="True"
                                Binding="{Binding CurrentHoldingValue, StringFormat=\{0:C\}}"/>
 
                 </DataGrid.Columns>

@@ -45,9 +45,18 @@ namespace PortfolioWatch.ViewModels
             }
             set
             {
-                Model.Size = value;
+                if (value >= 0)
+                {
+                    Model.Size = value;
+                }
+                else
+                {
+                    //force validation against negative shares.
+                    Model.Size = 0;
+                }
                 NotifyPropertyChanged("Size");
-                NotifyPropertyChanged("CurrentHolding");
+                NotifyPropertyChanged("CurrentHoldingCost");
+                NotifyPropertyChanged("CurrentHoldingValue");
             }
         }
 
@@ -61,7 +70,6 @@ namespace PortfolioWatch.ViewModels
             {
                 Model.Price = value;
                 NotifyPropertyChanged("Price");
-                NotifyPropertyChanged("CurrentHolding");
                 NotifyPropertyChanged("DailyDifference");
                 NotifyPropertyChanged("InceptionToDateDifference");
                 NotifyPropertyChanged("CurrentHoldingCost");

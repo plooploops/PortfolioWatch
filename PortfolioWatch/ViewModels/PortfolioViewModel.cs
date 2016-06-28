@@ -71,7 +71,5 @@ namespace PortfolioWatch.ViewModels
         }
 
         #endregion
-
-
     }
 }
